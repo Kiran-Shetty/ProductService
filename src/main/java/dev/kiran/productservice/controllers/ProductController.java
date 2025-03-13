@@ -1,21 +1,24 @@
 package dev.kiran.productservice.controllers;
 
+import dev.kiran.productservice.dtos.FakeStoreCreateProductDtos;
 import dev.kiran.productservice.models.Product;
 import dev.kiran.productservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @RestController
 public class ProductController {
 
-    private ProductService productService;
- 
+    private final RestTemplate restTemplate;
+    private final ProductService productService;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, RestTemplate restTemplate) {
         this.productService = productService;
+        this.restTemplate = restTemplate;
     }
 
     @GetMapping("products")
@@ -25,12 +28,17 @@ public class ProductController {
 
     @GetMapping("/products/{id}")
     public Product getProductById(@PathVariable("id") Long id) {
-        productService.getProductDetails(id);
-        return null;
+        return productService.getProductDetails(id);
     }
 
-    public void createProduct() {
+    @PostMapping("/products")
+    public Product createProduct(@RequestBody FakeStoreCreateProductDtos responseDtos) {
+        return productService.createProduct(responseDtos.getTitle(), responseDtos.getDescription(), responseDtos.getImage(), responseDtos.getPrice(), responseDtos.getCategory());
+    }
 
+    @GetMapping("/products")
+    public List<Product> getProducts() {
+        return productService.getAllProducts();
     }
 
 
